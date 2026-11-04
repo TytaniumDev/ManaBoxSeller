@@ -6,16 +6,16 @@ A small static site that converts a [ManaBox](https://manabox.app) export
 ## How it works
 
 1. **Parse** the ManaBox file into `Card` objects (`js/manabox-csv.js`, `js/manabox-txt.js`).
-2. **Fill in set names for `.txt` exports.** The text format only has set codes, so the site
-   asks the [Scryfall API](https://scryfall.com/docs/api/cards/collection) for each printing by
-   set code and collector number (`js/scryfall.js`). CSV exports already include set names.
+2. **Look up the deck on Scryfall** (`js/scryfall.js`). A batched search asks for every
+   version of the deck's card names in their sets, e.g. `(e:mkc (!"Ransom Note" or !"Plains"))`,
+   a few requests per deck at most. `.txt` exports only have set codes, so their set names come
+   from the same results; the [collection endpoint](https://scryfall.com/docs/api/cards/collection)
+   is only used for any card the search missed. Answers are remembered for the rest of the visit.
 3. **Translate names** to Card Kingdom's conventions (`js/card-kingdom-names.js`):
    precon sets like `Murders at Karlov Manor Commander` become `... Commander Decks`, and
    cards with several versions in one set (basic lands, or e.g. the four Ransom Note arts in
    Blame Game) get a 4-digit collector number, e.g. `Mountain (0283)`, `Ransom Note (0045)`.
-   To know which cards need this, the site asks Scryfall for every version of the deck's own
-   card names in their sets (a few batched searches per deck), and remembers the answers for
-   the rest of the visit.
+   Step 2's search results tell the site which cards need this.
 4. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
    with duplicates merged (`js/card-kingdom.js`).
 

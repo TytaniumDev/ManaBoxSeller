@@ -51,12 +51,39 @@ export async function resolveScryfallIds(cards, fetchFn = fetch) {
 
 /**
  * @typedef {object} ScryfallPrinting
+ * @property {string} id
  * @property {string} name
+ * @property {string} set       lowercase set code, e.g. "mkc"
+ * @property {string} set_name
  * @property {string} collector_number
  * @property {string} [border_color]
  * @property {string[]} [frame_effects]
  * @property {boolean} [promo]
  */
+
+/**
+ * Fills in `scryfallId` and `setName` for cards without a Scryfall ID
+ * (i.e. from a .txt export) by matching set code and collector number
+ * against printings that were already fetched. Cards with no match are
+ * returned unchanged, for {@link resolveScryfallIds} to look up.
+ *
+ * @param {import('./card.js').Card[]} cards
+ * @param {Map<string, ScryfallPrinting[]>} printingsBySet
+ * @returns {import('./card.js').Card[]}
+ */
+export function fillFromPrintings(cards, printingsBySet) {
+  const byPrinting = new Map(
+    [...printingsBySet.values()].flat().map((printing) => [
+      printingKey({ setCode: printing.set, collectorNumber: printing.collector_number }),
+      printing,
+    ]),
+  );
+  return cards.map((card) => {
+    if (card.scryfallId) return card;
+    const match = byPrinting.get(printingKey(card));
+    return match ? { ...card, scryfallId: match.id, setName: match.set_name } : card;
+  });
+}
 
 /**
  * Fetches every printing of the given cards' names within their sets, e.g.

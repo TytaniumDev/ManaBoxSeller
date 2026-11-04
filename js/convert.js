@@ -1,6 +1,6 @@
 import { parseManaboxCsv } from './manabox-csv.js';
 import { parseManaboxTxt } from './manabox-txt.js';
-import { resolveScryfallIds, fetchPrintingsByName } from './scryfall.js';
+import { resolveScryfallIds, fetchPrintingsByName, fillFromPrintings } from './scryfall.js';
 import { findNamesWithSeveralVersions } from './card-kingdom-names.js';
 import { toCardKingdomRows, toCardKingdomCsv } from './card-kingdom.js';
 
@@ -28,8 +28,11 @@ export function parserFor(fileName) {
  */
 export async function convert({ fileName, text, fetchFn, printingsCache }) {
   const parsed = parserFor(fileName)(text);
-  const resolved = await resolveScryfallIds(parsed.cards, fetchFn);
-  const sets = await fetchPrintingsByName(resolved.cards, fetchFn, printingsCache);
+  const sets = await fetchPrintingsByName(parsed.cards, fetchFn, printingsCache);
+  // The name search usually covers .txt cards' set names too; the
+  // collection lookup only runs for any it missed.
+  const filled = fillFromPrintings(parsed.cards, sets.printingsBySet);
+  const resolved = await resolveScryfallIds(filled, fetchFn);
   const severalVersionsBySet = new Map(
     [...sets.printingsBySet].map(([setCode, printings]) => [setCode, findNamesWithSeveralVersions(printings)]),
   );

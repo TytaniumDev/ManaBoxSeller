@@ -64,8 +64,8 @@ test('skips the network when every card already has a Scryfall ID', async () => 
   assert.equal(calls.length, 0);
 });
 
-test('converts a TXT export end to end', async () => {
-  const { fetchFn } = fakeScryfall(scryfallCards);
+test('converts a TXT export end to end with a single search', async () => {
+  const { fetchFn, calls, searches } = fakeScryfall(scryfallCards);
   const text = '// COMMANDER\n1 Nelly Borca, Impulsive Accuser (MKC) 4 *F*\n\n1 Ransom Note (MKC) 45\n';
   const result = await convert({ fileName: 'deck.TXT', text, fetchFn });
   assert.equal(
@@ -74,6 +74,18 @@ test('converts a TXT export end to end', async () => {
       'Ransom Note (0045),Murders at Karlov Manor Commander Decks,FALSE,1\n',
   );
   assert.deepEqual(result.warnings, []);
+  assert.equal(searches.length, 1);
+  assert.equal(calls.length, 0, 'set names came from the search, so no collection lookup');
+});
+
+test('falls back to the collection lookup for .txt cards the name search missed', async () => {
+  // Scryfall knows this card by its full double-faced name, so a search
+  // for the front face alone finds nothing.
+  const dfc = { ...mkc, id: 'dfc-id', name: 'Front // Back', collector_number: '7' };
+  const { fetchFn, calls } = fakeScryfall([...scryfallCards, dfc]);
+  const result = await convert({ fileName: 'deck.txt', text: '1 Front (MKC) 7\n', fetchFn });
+  assert.equal(calls.length, 1);
+  assert.equal(result.rows[0].edition, 'Murders at Karlov Manor Commander Decks');
 });
 
 test('rejects other file types', async () => {
