@@ -1,5 +1,4 @@
 import { toCsv } from './csv.js';
-import { findCardKingdomPrinting } from './card-kingdom-map.js';
 
 /**
  * @typedef {object} CardKingdomRow
@@ -10,34 +9,21 @@ import { findCardKingdomPrinting } from './card-kingdom-map.js';
  */
 
 /**
- * Converts cards to Card Kingdom sell-list rows. Cards that end up with the
- * same name, edition and foil are merged and their quantities summed.
- *
- * Cards missing from the Card Kingdom map keep their ManaBox/Scryfall name
- * and set name, and produce a warning so they can be checked by hand.
+ * Converts cards to Card Kingdom sell-list rows, using the ManaBox/Scryfall
+ * set name. Cards with the same name, set and foil are merged and their
+ * quantities summed.
  *
  * @param {import('./card.js').Card[]} cards
- * @param {import('./card-kingdom-map.js').CardKingdomMap | undefined} map
- * @returns {{ rows: CardKingdomRow[], warnings: string[] }}
+ * @returns {CardKingdomRow[]}
  */
-export function toCardKingdomRows(cards, map) {
+export function toCardKingdomRows(cards) {
   /** @type {Map<string, CardKingdomRow>} */
   const merged = new Map();
-  const warnings = [];
 
   for (const card of cards) {
-    const printing = map && card.scryfallId
-      ? findCardKingdomPrinting(map, card.scryfallId, card.finish)
-      : undefined;
-    if (map && !printing) {
-      warnings.push(
-        `${card.name} (${card.setCode} ${card.collectorNumber}, ${card.finish}) isn't in Card Kingdom's list; using "${card.setName ?? card.setCode}".`,
-      );
-    }
-
     const row = {
-      name: printing?.name ?? card.name,
-      edition: printing?.edition ?? card.setName ?? card.setCode,
+      name: card.name,
+      edition: card.setName ?? card.setCode,
       foil: card.finish !== 'normal',
       quantity: card.quantity,
     };
@@ -47,10 +33,9 @@ export function toCardKingdomRows(cards, map) {
     else merged.set(key, row);
   }
 
-  const rows = [...merged.values()].sort(
+  return [...merged.values()].sort(
     (a, b) => a.name.localeCompare(b.name) || a.edition.localeCompare(b.edition),
   );
-  return { rows, warnings };
 }
 
 /**

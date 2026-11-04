@@ -1,7 +1,5 @@
 import { convert } from './convert.js';
 
-const MAP_URL = 'data/card-kingdom-map.json';
-
 const dropZone = document.querySelector('#drop-zone');
 const fileInput = document.querySelector('#file-input');
 const status = document.querySelector('#status');
@@ -10,8 +8,6 @@ const result = document.querySelector('#result');
 const preview = document.querySelector('#preview');
 const downloadButton = document.querySelector('#download');
 
-/** @type {Promise<import('./card-kingdom-map.js').CardKingdomMap | undefined> | undefined} */
-let mapPromise;
 let download = { csv: '', fileName: '' };
 
 dropZone.addEventListener('dragover', (event) => {
@@ -43,9 +39,7 @@ async function handleFile(file) {
   warningList.replaceChildren();
   status.textContent = `Converting ${file.name}…`;
   try {
-    const map = await loadMap();
-    const { rows, csv, warnings } = await convert({ fileName: file.name, text: await file.text(), map });
-    if (!map) warnings.unshift("Card Kingdom's set list couldn't be loaded, so ManaBox set names are used.");
+    const { rows, csv, warnings } = await convert({ fileName: file.name, text: await file.text() });
 
     download = { csv, fileName: file.name.replace(/\.[^.]+$/, '') + ' - Card Kingdom.csv' };
     const total = rows.reduce((sum, row) => sum + row.quantity, 0);
@@ -56,14 +50,6 @@ async function handleFile(file) {
   } catch (error) {
     status.textContent = error.message;
   }
-}
-
-/** Loads the Card Kingdom map once; resolves to undefined if it's unavailable. */
-function loadMap() {
-  mapPromise ??= fetch(MAP_URL)
-    .then((response) => (response.ok ? response.json() : undefined))
-    .catch(() => undefined);
-  return mapPromise;
 }
 
 /** @param {string[]} warnings */

@@ -21,16 +21,15 @@ export function parserFor(fileName) {
  * @param {object} input
  * @param {string} input.fileName
  * @param {string} input.text
- * @param {import('./card-kingdom-map.js').CardKingdomMap | undefined} input.map
  * @param {typeof fetch} [input.fetchFn]
  */
-export async function convert({ fileName, text, map, fetchFn }) {
+export async function convert({ fileName, text, fetchFn }) {
   const parsed = parserFor(fileName)(text);
   const resolved = await resolveScryfallIds(parsed.cards, fetchFn);
-  const { rows, warnings } = toCardKingdomRows(resolved.cards, map);
+  const rows = toCardKingdomRows(resolved.cards);
   return {
     rows,
     csv: toCardKingdomCsv(rows),
-    warnings: [...parsed.warnings, ...resolved.warnings, ...warnings],
+    warnings: [...parsed.warnings, ...resolved.warnings],
   };
 }

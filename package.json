@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "build:map": "node scripts/build-card-kingdom-map.js",
     "serve": "python3 -m http.server 8000"
   },
   "engines": {

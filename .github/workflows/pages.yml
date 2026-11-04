@@ -3,9 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  schedule:
-    # Daily, so new Card Kingdom sets and printings are picked up automatically.
-    - cron: '0 9 * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,11 +23,8 @@ jobs:
         with:
           node-version: 22
       - run: npm test
-      # If Card Kingdom's price list can't be fetched, this fails and the
-      # previous deployment (with yesterday's map) stays live.
-      - run: npm run build:map -- _site/data/card-kingdom-map.json
       - name: Copy site files
-        run: cp -r index.html styles.css js _site/
+        run: mkdir _site && cp -r index.html styles.css js _site/
       - uses: actions/upload-pages-artifact@v3
 
   deploy:
