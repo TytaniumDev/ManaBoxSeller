@@ -89,3 +89,16 @@ test('warns instead of failing when a set cannot be loaded', async () => {
   assert.equal(printingsBySet.size, 0);
   assert.equal(warnings.length, 1);
 });
+
+test('reuses sets from the cache instead of fetching them again', async () => {
+  let requests = 0;
+  const fetchFn = async () => {
+    requests++;
+    return { ok: true, status: 200, json: async () => ({ data: [{ name: 'A' }], has_more: false }) };
+  };
+  const cache = new Map();
+  await fetchSetPrintings(['MKC'], fetchFn, cache);
+  const { printingsBySet } = await fetchSetPrintings(['MKC'], fetchFn, cache);
+  assert.equal(requests, 1);
+  assert.deepEqual(printingsBySet.get('MKC'), [{ name: 'A' }]);
+});

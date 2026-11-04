@@ -58,19 +58,29 @@ export async function resolveScryfallIds(cards, fetchFn = fetch) {
  */
 
 /**
- * Fetches every printing in each of the given sets.
+ * Fetches every printing in each of the given sets. Sets already in `cache`
+ * are not fetched again, and newly loaded sets are added to it, so passing
+ * the same cache to later calls skips repeat downloads.
  *
  * @param {string[]} setCodes
  * @param {typeof fetch} [fetchFn] injectable for tests
+ * @param {Map<string, ScryfallPrinting[]>} [cache] set code → printings
  * @returns {Promise<{ printingsBySet: Map<string, ScryfallPrinting[]>, warnings: string[] }>}
  */
-export async function fetchSetPrintings(setCodes, fetchFn = fetch) {
+export async function fetchSetPrintings(setCodes, fetchFn = fetch, cache = new Map()) {
   const printingsBySet = new Map();
   const warnings = [];
-  for (const [i, setCode] of [...new Set(setCodes)].entries()) {
-    if (i > 0) await delay(BATCH_DELAY_MS);
+  let fetched = 0;
+  for (const setCode of new Set(setCodes)) {
+    if (cache.has(setCode)) {
+      printingsBySet.set(setCode, cache.get(setCode));
+      continue;
+    }
+    if (fetched++ > 0) await delay(BATCH_DELAY_MS);
     try {
-      printingsBySet.set(setCode, await fetchAllPages(searchUrl(setCode), fetchFn));
+      const printings = await fetchAllPages(searchUrl(setCode), fetchFn);
+      cache.set(setCode, printings);
+      printingsBySet.set(setCode, printings);
     } catch (error) {
       warnings.push(`Couldn't load set ${setCode} from Scryfall (${error.message}); its card names may not match Card Kingdom.`);
     }
