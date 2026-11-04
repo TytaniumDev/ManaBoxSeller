@@ -13,7 +13,8 @@ A small static site that converts a [ManaBox](https://manabox.app) export
    precon sets like `Murders at Karlov Manor Commander` become `... Commander Decks`, and
    cards with several versions in one set (basic lands, or e.g. the four Ransom Note arts in
    Blame Game) get a 4-digit collector number, e.g. `Mountain (0283)`, `Ransom Note (0045)`.
-   The site loads each set's printings from Scryfall to know which cards need this.
+   The site loads each set's printings from Scryfall to know which cards need this, once
+   per visit: later files reuse sets that were already loaded.
 4. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
    with duplicates merged (`js/card-kingdom.js`).
 
