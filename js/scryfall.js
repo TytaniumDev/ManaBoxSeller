@@ -2,6 +2,7 @@ const COLLECTION_URL = 'https://api.scryfall.com/cards/collection';
 const SEARCH_URL = 'https://api.scryfall.com/cards/search';
 const BATCH_SIZE = 75; // Scryfall's limit per request
 const BATCH_DELAY_MS = 100; // Scryfall asks for at most ~10 requests/second
+const MAX_QUERY_LENGTH = 900; // keeps search URLs well within Scryfall's limits
 
 /**
  * Fills in `scryfallId` and `setName` for cards that don't have a
@@ -50,7 +51,10 @@ export async function resolveScryfallIds(cards, fetchFn = fetch) {
 
 /**
  * @typedef {object} ScryfallPrinting
+ * @property {string} id
  * @property {string} name
+ * @property {string} set       lowercase set code, e.g. "mkc"
+ * @property {string} set_name
  * @property {string} collector_number
  * @property {string} [border_color]
  * @property {string[]} [frame_effects]
@@ -58,39 +62,106 @@ export async function resolveScryfallIds(cards, fetchFn = fetch) {
  */
 
 /**
- * Fetches every printing in each of the given sets. Sets already in `cache`
- * are not fetched again, and newly loaded sets are added to it, so passing
- * the same cache to later calls skips repeat downloads.
+ * Fills in `scryfallId` and `setName` for cards without a Scryfall ID
+ * (i.e. from a .txt export) by matching set code and collector number
+ * against printings that were already fetched. Cards with no match are
+ * returned unchanged, for {@link resolveScryfallIds} to look up.
  *
- * @param {string[]} setCodes
+ * @param {import('./card.js').Card[]} cards
+ * @param {Map<string, ScryfallPrinting[]>} printingsBySet
+ * @returns {import('./card.js').Card[]}
+ */
+export function fillFromPrintings(cards, printingsBySet) {
+  const byPrinting = new Map(
+    [...printingsBySet.values()].flat().map((printing) => [
+      printingKey({ setCode: printing.set, collectorNumber: printing.collector_number }),
+      printing,
+    ]),
+  );
+  return cards.map((card) => {
+    if (card.scryfallId) return card;
+    const match = byPrinting.get(printingKey(card));
+    return match ? { ...card, scryfallId: match.id, setName: match.set_name } : card;
+  });
+}
+
+/**
+ * Fetches every printing of the given cards' names within their sets, e.g.
+ * all four Ransom Notes in MKC, so callers can tell which names have several
+ * versions in a set. Only the deck's own names are requested, packed into as
+ * few searches as fit Scryfall's query length.
+ *
+ * Results are stored in `cache` per set and name; pass the same cache to
+ * later calls to skip names that were already looked up.
+ *
+ * @param {Array<{ setCode: string, name: string }>} cards
  * @param {typeof fetch} [fetchFn] injectable for tests
- * @param {Map<string, ScryfallPrinting[]>} [cache] set code → printings
+ * @param {Map<string, ScryfallPrinting[]>} [cache] "SET|name" → printings
  * @returns {Promise<{ printingsBySet: Map<string, ScryfallPrinting[]>, warnings: string[] }>}
  */
-export async function fetchSetPrintings(setCodes, fetchFn = fetch, cache = new Map()) {
-  const printingsBySet = new Map();
+export async function fetchPrintingsByName(cards, fetchFn = fetch, cache = new Map()) {
+  const wanted = uniqueBy(cards, nameKey).map(({ setCode, name }) => ({ setCode, name }));
+  const missing = wanted.filter((card) => !cache.has(nameKey(card)));
   const warnings = [];
-  let fetched = 0;
-  for (const setCode of new Set(setCodes)) {
-    if (cache.has(setCode)) {
-      printingsBySet.set(setCode, cache.get(setCode));
-      continue;
-    }
-    if (fetched++ > 0) await delay(BATCH_DELAY_MS);
+
+  for (const [i, query] of buildNameQueries(missing).entries()) {
+    if (i > 0) await delay(BATCH_DELAY_MS);
     try {
-      const printings = await fetchAllPages(searchUrl(setCode), fetchFn);
-      cache.set(setCode, printings);
-      printingsBySet.set(setCode, printings);
+      const params = new URLSearchParams({ q: query.text, unique: 'prints' });
+      const printings = await fetchAllPages(`${SEARCH_URL}?${params}`, fetchFn);
+      for (const card of query.cards) cache.set(nameKey(card), []);
+      for (const printing of printings) {
+        cache.get(nameKey({ setCode: printing.set, name: printing.name }))?.push(printing);
+      }
     } catch (error) {
-      warnings.push(`Couldn't load set ${setCode} from Scryfall (${error.message}); its card names may not match Card Kingdom.`);
+      warnings.push(`Couldn't load card versions from Scryfall (${error.message}); some names may not match Card Kingdom.`);
     }
+  }
+
+  const printingsBySet = new Map();
+  for (const card of wanted) {
+    const printings = cache.get(nameKey(card));
+    if (!printings) continue;
+    if (!printingsBySet.has(card.setCode)) printingsBySet.set(card.setCode, []);
+    printingsBySet.get(card.setCode).push(...printings);
   }
   return { printingsBySet, warnings };
 }
 
-function searchUrl(setCode) {
-  const params = new URLSearchParams({ q: `e:${setCode.toLowerCase()}`, unique: 'prints' });
-  return `${SEARCH_URL}?${params}`;
+/**
+ * Packs set/name pairs into Scryfall search queries of at most `maxLength`
+ * characters, e.g. `(e:mkc (!"Ransom Note" or !"Plains")) or (e:mkm !"Shock")`.
+ *
+ * @param {Array<{ setCode: string, name: string }>} cards
+ * @param {number} [maxLength]
+ * @returns {Array<{ text: string, cards: Array<{ setCode: string, name: string }> }>}
+ */
+export function buildNameQueries(cards, maxLength = MAX_QUERY_LENGTH) {
+  const queries = [];
+  let batch = [];
+  for (const card of cards) {
+    if (batch.length > 0 && queryText([...batch, card]).length > maxLength) {
+      queries.push({ text: queryText(batch), cards: batch });
+      batch = [];
+    }
+    batch.push(card);
+  }
+  if (batch.length > 0) queries.push({ text: queryText(batch), cards: batch });
+  return queries;
+}
+
+function queryText(cards) {
+  const namesBySet = Map.groupBy(cards, (card) => card.setCode.toLowerCase());
+  return [...namesBySet]
+    .map(([set, group]) => {
+      const names = group.map((card) => `!"${card.name.replaceAll('"', '\\"')}"`);
+      return `(e:${set} ${names.length > 1 ? `(${names.join(' or ')})` : names[0]})`;
+    })
+    .join(' or ');
+}
+
+function nameKey({ setCode, name }) {
+  return `${setCode.toUpperCase()}|${name}`;
 }
 
 /** Follows Scryfall's `next_page` links and returns every card. */
