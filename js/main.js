@@ -13,8 +13,8 @@ const clearButton = document.querySelector('#clear');
 
 /** @type {import('./sell-list.js').Deck[]} */
 let decks = [];
-/** Scryfall set printings already downloaded this visit, shared by every conversion. */
-const setCache = new Map();
+/** Scryfall printings already looked up this visit, shared by every conversion. */
+const printingsCache = new Map();
 
 dropZone.addEventListener('dragover', (event) => {
   event.preventDefault();
@@ -58,7 +58,7 @@ async function addFiles(files) {
   for (const file of files) {
     status.textContent = `Converting ${file.name}…`;
     try {
-      const converted = await convert({ fileName: file.name, text: await file.text(), setCache });
+      const converted = await convert({ fileName: file.name, text: await file.text(), printingsCache });
       decks = [...decks, { name: deckName(file.name), rows: converted.rows }];
       warnings.push(...converted.warnings.map((text) => `${file.name}: ${text}`));
     } catch (error) {

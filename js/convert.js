@@ -1,6 +1,6 @@
 import { parseManaboxCsv } from './manabox-csv.js';
 import { parseManaboxTxt } from './manabox-txt.js';
-import { resolveScryfallIds, fetchSetPrintings } from './scryfall.js';
+import { resolveScryfallIds, fetchPrintingsByName } from './scryfall.js';
 import { findNamesWithSeveralVersions } from './card-kingdom-names.js';
 import { toCardKingdomRows, toCardKingdomCsv } from './card-kingdom.js';
 
@@ -23,13 +23,13 @@ export function parserFor(fileName) {
  * @param {string} input.fileName
  * @param {string} input.text
  * @param {typeof fetch} [input.fetchFn]
- * @param {Map<string, import('./scryfall.js').ScryfallPrinting[]>} [input.setCache]
- *   reuse across calls so each set is only downloaded from Scryfall once
+ * @param {Map<string, import('./scryfall.js').ScryfallPrinting[]>} [input.printingsCache]
+ *   reuse across calls so each card name is only looked up on Scryfall once
  */
-export async function convert({ fileName, text, fetchFn, setCache }) {
+export async function convert({ fileName, text, fetchFn, printingsCache }) {
   const parsed = parserFor(fileName)(text);
   const resolved = await resolveScryfallIds(parsed.cards, fetchFn);
-  const sets = await fetchSetPrintings(resolved.cards.map((card) => card.setCode), fetchFn, setCache);
+  const sets = await fetchPrintingsByName(resolved.cards, fetchFn, printingsCache);
   const severalVersionsBySet = new Map(
     [...sets.printingsBySet].map(([setCode, printings]) => [setCode, findNamesWithSeveralVersions(printings)]),
   );
