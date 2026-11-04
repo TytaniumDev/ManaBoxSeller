@@ -1,0 +1,14 @@
+{
+  "name": "manabox-seller",
+  "private": true,
+  "description": "Convert ManaBox exports into Card Kingdom sell-list CSVs.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build:map": "node scripts/build-card-kingdom-map.js",
+    "serve": "python3 -m http.server 8000"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
