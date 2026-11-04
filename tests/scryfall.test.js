@@ -39,7 +39,7 @@ test('skips the network when every card already has a Scryfall ID', async () => 
 test('converts a TXT export end to end', async () => {
   const { fetchFn } = fakeScryfall(scryfallCards);
   const result = await convert({ fileName: 'deck.TXT', text: '// COMMANDER\n1 Nelly Borca, Impulsive Accuser (MKC) 4 *F*\n', fetchFn });
-  assert.equal(result.csv, '"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander,TRUE,1\n');
+  assert.equal(result.csv, '"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander Decks,TRUE,1\n');
   assert.deepEqual(result.warnings, []);
 });
 

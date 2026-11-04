@@ -19,8 +19,8 @@ test('merges duplicates by name, set and foil', () => {
     { ...nelly, finish: 'normal', quantity: 1 },
   ]);
   assert.deepEqual(rows, [
-    { name: nelly.name, edition: nelly.setName, foil: true, quantity: 3 },
-    { name: nelly.name, edition: nelly.setName, foil: false, quantity: 1 },
+    { name: nelly.name, edition: 'Murders at Karlov Manor Commander Decks', foil: true, quantity: 3 },
+    { name: nelly.name, edition: 'Murders at Karlov Manor Commander Decks', foil: false, quantity: 1 },
   ]);
 });
 
@@ -34,6 +34,8 @@ test('converts the Blame Game CSV', () => {
   const rows = toCardKingdomRows(cards);
   assert.equal(rows.length, 86);
   const csv = toCardKingdomCsv(rows);
-  assert.match(csv, /^"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander,TRUE,1$/m);
-  assert.match(csv, /^Plains,Murders at Karlov Manor,FALSE,9$/m);
+  assert.match(csv, /^"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander Decks,TRUE,1$/m);
+  assert.match(csv, /^Escape Tunnel,Murders at Karlov Manor,FALSE,1$/m);
+  assert.match(csv, /^Plains \(0277\),Murders at Karlov Manor,FALSE,9$/m);
+  assert.match(csv, /^Mountain \(0283\),Murders at Karlov Manor,FALSE,7$/m);
 });
