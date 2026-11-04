@@ -20,11 +20,8 @@ import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
  * @returns {CardKingdomRow[]}
  */
 export function toCardKingdomRows(cards, severalVersionsBySet = new Map()) {
-  /** @type {Map<string, CardKingdomRow>} */
-  const merged = new Map();
-
-  for (const card of cards) {
-    const row = {
+  return mergeRows(
+    cards.map((card) => ({
       name: cardKingdomTitle(
         card.name,
         card.collectorNumber,
@@ -33,11 +30,27 @@ export function toCardKingdomRows(cards, severalVersionsBySet = new Map()) {
       edition: card.setName ? cardKingdomEdition(card.setName) : card.setCode,
       foil: card.finish !== 'normal',
       quantity: card.quantity,
-    };
+    })),
+  );
+}
+
+/**
+ * Merges rows with the same name, edition and foil by summing their
+ * quantities, and sorts the result by name then edition. Used both within
+ * one deck and to combine several decks into one sell list.
+ *
+ * @param {CardKingdomRow[]} rows
+ * @returns {CardKingdomRow[]}
+ */
+export function mergeRows(rows) {
+  /** @type {Map<string, CardKingdomRow>} */
+  const merged = new Map();
+
+  for (const row of rows) {
     const key = `${row.name}|${row.edition}|${row.foil}`;
     const existing = merged.get(key);
     if (existing) existing.quantity += row.quantity;
-    else merged.set(key, row);
+    else merged.set(key, { ...row });
   }
 
   return [...merged.values()].sort(

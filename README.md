@@ -17,6 +17,11 @@ A small static site that converts a [ManaBox](https://manabox.app) export
 4. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
    with duplicates merged (`js/card-kingdom.js`).
 
+You can drop several exports at once, or add more after converting. Each file becomes a deck
+in the page's list, and the download combines all of them, summing identical cards
+(`js/sell-list.js`). Decks can be removed one at a time or cleared; nothing is saved between
+page loads.
+
 `samples/` holds canonical example files; the tests run against them.
 `samples/card-kingdom-import-test/` holds a real upload to Card Kingdom and what it matched.
 
