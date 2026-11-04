@@ -1,4 +1,5 @@
 import { toCsv } from './csv.js';
+import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
 
 /**
  * @typedef {object} CardKingdomRow
@@ -9,9 +10,9 @@ import { toCsv } from './csv.js';
  */
 
 /**
- * Converts cards to Card Kingdom sell-list rows, using the ManaBox/Scryfall
- * set name. Cards with the same name, set and foil are merged and their
- * quantities summed.
+ * Converts cards to Card Kingdom sell-list rows, translating names to
+ * Card Kingdom's conventions. Cards with the same name, set and foil are
+ * merged and their quantities summed.
  *
  * @param {import('./card.js').Card[]} cards
  * @returns {CardKingdomRow[]}
@@ -22,8 +23,8 @@ export function toCardKingdomRows(cards) {
 
   for (const card of cards) {
     const row = {
-      name: card.name,
-      edition: card.setName ?? card.setCode,
+      name: cardKingdomTitle(card.name, card.collectorNumber),
+      edition: card.setName ? cardKingdomEdition(card.setName) : card.setCode,
       foil: card.finish !== 'normal',
       quantity: card.quantity,
     };

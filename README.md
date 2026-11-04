@@ -9,10 +9,14 @@ A small static site that converts a [ManaBox](https://manabox.app) export
 2. **Fill in set names for `.txt` exports.** The text format only has set codes, so the site
    asks the [Scryfall API](https://scryfall.com/docs/api/cards/collection) for each printing by
    set code and collector number (`js/scryfall.js`). CSV exports already include set names.
-3. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
+3. **Translate names** to Card Kingdom's conventions (`js/card-kingdom-names.js`):
+   precon sets like `Murders at Karlov Manor Commander` become `... Commander Decks`, and
+   basic lands get a 4-digit collector number, e.g. `Mountain (0283)`.
+4. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
    with duplicates merged (`js/card-kingdom.js`).
 
 `samples/` holds canonical example files; the tests run against them.
+`samples/card-kingdom-import-test/` holds a real upload to Card Kingdom and what it matched.
 
 ## Development
 
