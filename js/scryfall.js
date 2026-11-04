@@ -91,12 +91,13 @@ export function fillFromPrintings(cards, printingsBySet) {
  * versions in a set. Only the deck's own names are requested, packed into as
  * few searches as fit Scryfall's query length.
  *
- * Results are stored in `cache` per set and name; pass the same cache to
- * later calls to skip names that were already looked up.
+ * Results are stored in `cache` per set and name (only the fields this site
+ * uses); pass the same cache to later calls to skip names already looked up.
  *
  * @param {Array<{ setCode: string, name: string }>} cards
  * @param {typeof fetch} [fetchFn] injectable for tests
- * @param {Map<string, ScryfallPrinting[]>} [cache] "SET|name" → printings
+ * @param {Pick<Map<string, ScryfallPrinting[]>, 'has' | 'get' | 'set'>} [cache]
+ *   "SET|name" → printings, e.g. a Map or a StoredCache
  * @returns {Promise<{ printingsBySet: Map<string, ScryfallPrinting[]>, warnings: string[] }>}
  */
 export async function fetchPrintingsByName(cards, fetchFn = fetch, cache = new Map()) {
@@ -109,9 +110,9 @@ export async function fetchPrintingsByName(cards, fetchFn = fetch, cache = new M
     try {
       const params = new URLSearchParams({ q: query.text, unique: 'prints' });
       const printings = await fetchAllPages(`${SEARCH_URL}?${params}`, fetchFn);
-      for (const card of query.cards) cache.set(nameKey(card), []);
-      for (const printing of printings) {
-        cache.get(nameKey({ setCode: printing.set, name: printing.name }))?.push(printing);
+      const byName = Map.groupBy(printings, (printing) => nameKey({ setCode: printing.set, name: printing.name }));
+      for (const card of query.cards) {
+        cache.set(nameKey(card), (byName.get(nameKey(card)) ?? []).map(slimPrinting));
       }
     } catch (error) {
       warnings.push(`Couldn't load card versions from Scryfall (${error.message}); some names may not match Card Kingdom.`);
@@ -158,6 +159,16 @@ function queryText(cards) {
       return `(e:${set} ${names.length > 1 ? `(${names.join(' or ')})` : names[0]})`;
     })
     .join(' or ');
+}
+
+/**
+ * Keeps only the printing fields this site reads, so cached lookups stay small.
+ *
+ * @param {ScryfallPrinting} printing
+ * @returns {ScryfallPrinting}
+ */
+function slimPrinting({ id, name, set, set_name, collector_number, border_color, frame_effects, promo }) {
+  return { id, name, set, set_name, collector_number, border_color, frame_effects, promo };
 }
 
 function nameKey({ setCode, name }) {

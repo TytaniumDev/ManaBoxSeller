@@ -1,5 +1,6 @@
-import { convert } from './convert.js';
+import { convertAll } from './convert.js';
 import { combineDecks, deckName } from './sell-list.js';
+import { StoredCache } from './stored-cache.js';
 
 const dropZone = document.querySelector('#drop-zone');
 const fileInput = document.querySelector('#file-input');
@@ -13,8 +14,11 @@ const clearButton = document.querySelector('#clear');
 
 /** @type {import('./sell-list.js').Deck[]} */
 let decks = [];
-/** Scryfall printings already looked up this visit, shared by every conversion. */
-const printingsCache = new Map();
+/**
+ * Scryfall lookups, kept for a week across visits so repeat decks don't
+ * hit Scryfall again (Scryfall asks clients to cache for at least a day).
+ */
+const printingsCache = new StoredCache('scryfall-printings-v1', 7 * 24 * 60 * 60 * 1000);
 
 dropZone.addEventListener('dragover', (event) => {
   event.preventDefault();
@@ -45,29 +49,34 @@ clearButton.addEventListener('click', () => {
 });
 
 /**
- * Converts each file in turn and adds it to the sell list.
+ * Converts the files together, so they share Scryfall lookups, and adds
+ * them to the sell list.
  *
  * @param {File[]} files
  */
 async function addFiles(files) {
   if (files.length === 0) return;
   warningList.replaceChildren();
-  const warnings = [];
-  const failures = [];
+  status.textContent = files.length === 1 ? `Converting ${files[0].name}…` : `Converting ${files.length} files…`;
 
-  for (const file of files) {
-    status.textContent = `Converting ${file.name}…`;
-    try {
-      const converted = await convert({ fileName: file.name, text: await file.text(), printingsCache });
-      decks = [...decks, { name: deckName(file.name), rows: converted.rows }];
-      warnings.push(...converted.warnings.map((text) => `${file.name}: ${text}`));
-    } catch (error) {
-      failures.push(`${file.name}: ${error.message}`);
+  try {
+    const inputs = await Promise.all(files.map(async (file) => ({ fileName: file.name, text: await file.text() })));
+    const converted = await convertAll(inputs, { printingsCache });
+    const failures = [];
+    const warnings = [...converted.warnings];
+    for (const deck of converted.decks) {
+      if (deck.error) {
+        failures.push(`${deck.fileName}: ${deck.error.message}`);
+        continue;
+      }
+      decks = [...decks, { name: deckName(deck.fileName), rows: deck.rows }];
+      warnings.push(...deck.warnings.map((text) => `${deck.fileName}: ${text}`));
     }
-    render();
+    showWarnings([...failures, ...warnings]);
+  } catch (error) {
+    showWarnings([error.message]);
   }
-
-  showWarnings([...failures, ...warnings]);
+  render();
   status.textContent = summary();
 }
 

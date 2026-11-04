@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveScryfallIds, fetchPrintingsByName, buildNameQueries } from '../js/scryfall.js';
-import { convert } from '../js/convert.js';
+import { convert, convertAll } from '../js/convert.js';
 
 /** Reads the set/name pairs back out of a buildNameQueries query. */
 function parseNameQuery(query) {
@@ -145,4 +145,22 @@ test('builds name queries grouped by set and split by length', () => {
   assert.ok(split.every((q) => q.text.length <= 40));
   assert.deepEqual(split.flatMap((q) => q.cards), cards);
   for (const query of split) assert.deepEqual(parseNameQuery(query.text), query.cards.map((c) => ({ set: c.setCode.toLowerCase(), name: c.name })));
+});
+
+test('converts several files with one shared search', async () => {
+  const { fetchFn, calls, searches } = fakeScryfall(scryfallCards);
+  const { decks, warnings } = await convertAll(
+    [
+      { fileName: 'a.txt', text: '1 Ransom Note (MKC) 45\n' },
+      { fileName: 'b.txt', text: '2 Ransom Note (MKC) 46\n1 Nelly Borca, Impulsive Accuser (MKC) 4\n' },
+      { fileName: 'c.json', text: '' },
+    ],
+    { fetchFn },
+  );
+  assert.equal(searches.length, 1);
+  assert.equal(calls.length, 0);
+  assert.deepEqual(warnings, []);
+  assert.deepEqual(decks[0].rows.map((row) => row.name), ['Ransom Note (0045)']);
+  assert.deepEqual(decks[1].rows.map((row) => row.name), ['Nelly Borca, Impulsive Accuser', 'Ransom Note (0046)']);
+  assert.match(decks[2].error.message, /\.csv or \.txt/);
 });
