@@ -15,15 +15,21 @@ import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
  * merged and their quantities summed.
  *
  * @param {import('./card.js').Card[]} cards
+ * @param {Map<string, Set<string>>} [severalVersionsBySet] set code → names
+ *   with several versions in that set, from findNamesWithSeveralVersions
  * @returns {CardKingdomRow[]}
  */
-export function toCardKingdomRows(cards) {
+export function toCardKingdomRows(cards, severalVersionsBySet = new Map()) {
   /** @type {Map<string, CardKingdomRow>} */
   const merged = new Map();
 
   for (const card of cards) {
     const row = {
-      name: cardKingdomTitle(card.name, card.collectorNumber),
+      name: cardKingdomTitle(
+        card.name,
+        card.collectorNumber,
+        severalVersionsBySet.get(card.setCode)?.has(card.name),
+      ),
       edition: card.setName ? cardKingdomEdition(card.setName) : card.setCode,
       foil: card.finish !== 'normal',
       quantity: card.quantity,

@@ -1,4 +1,5 @@
 const COLLECTION_URL = 'https://api.scryfall.com/cards/collection';
+const SEARCH_URL = 'https://api.scryfall.com/cards/search';
 const BATCH_SIZE = 75; // Scryfall's limit per request
 const BATCH_DELAY_MS = 100; // Scryfall asks for at most ~10 requests/second
 
@@ -45,6 +46,56 @@ export async function resolveScryfallIds(cards, fetchFn = fetch) {
     return { ...card, scryfallId: match.id, setName: match.set_name };
   });
   return { cards: resolved, warnings };
+}
+
+/**
+ * @typedef {object} ScryfallPrinting
+ * @property {string} name
+ * @property {string} collector_number
+ * @property {string} [border_color]
+ * @property {string[]} [frame_effects]
+ * @property {boolean} [promo]
+ */
+
+/**
+ * Fetches every printing in each of the given sets.
+ *
+ * @param {string[]} setCodes
+ * @param {typeof fetch} [fetchFn] injectable for tests
+ * @returns {Promise<{ printingsBySet: Map<string, ScryfallPrinting[]>, warnings: string[] }>}
+ */
+export async function fetchSetPrintings(setCodes, fetchFn = fetch) {
+  const printingsBySet = new Map();
+  const warnings = [];
+  for (const [i, setCode] of [...new Set(setCodes)].entries()) {
+    if (i > 0) await delay(BATCH_DELAY_MS);
+    try {
+      printingsBySet.set(setCode, await fetchAllPages(searchUrl(setCode), fetchFn));
+    } catch (error) {
+      warnings.push(`Couldn't load set ${setCode} from Scryfall (${error.message}); its card names may not match Card Kingdom.`);
+    }
+  }
+  return { printingsBySet, warnings };
+}
+
+function searchUrl(setCode) {
+  const params = new URLSearchParams({ q: `e:${setCode.toLowerCase()}`, unique: 'prints' });
+  return `${SEARCH_URL}?${params}`;
+}
+
+/** Follows Scryfall's `next_page` links and returns every card. */
+async function fetchAllPages(url, fetchFn) {
+  const cards = [];
+  for (let next = url; next; ) {
+    if (cards.length > 0) await delay(BATCH_DELAY_MS);
+    const response = await fetchFn(next, { headers: { Accept: 'application/json' } });
+    if (response.status === 404) break; // Scryfall's "no cards found"
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const page = await response.json();
+    cards.push(...page.data);
+    next = page.has_more ? page.next_page : undefined;
+  }
+  return cards;
 }
 
 function printingKey({ setCode, collectorNumber }) {

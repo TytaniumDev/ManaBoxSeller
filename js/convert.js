@@ -1,6 +1,7 @@
 import { parseManaboxCsv } from './manabox-csv.js';
 import { parseManaboxTxt } from './manabox-txt.js';
-import { resolveScryfallIds } from './scryfall.js';
+import { resolveScryfallIds, fetchSetPrintings } from './scryfall.js';
+import { findNamesWithSeveralVersions } from './card-kingdom-names.js';
 import { toCardKingdomRows, toCardKingdomCsv } from './card-kingdom.js';
 
 /**
@@ -26,10 +27,14 @@ export function parserFor(fileName) {
 export async function convert({ fileName, text, fetchFn }) {
   const parsed = parserFor(fileName)(text);
   const resolved = await resolveScryfallIds(parsed.cards, fetchFn);
-  const rows = toCardKingdomRows(resolved.cards);
+  const sets = await fetchSetPrintings(resolved.cards.map((card) => card.setCode), fetchFn);
+  const severalVersionsBySet = new Map(
+    [...sets.printingsBySet].map(([setCode, printings]) => [setCode, findNamesWithSeveralVersions(printings)]),
+  );
+  const rows = toCardKingdomRows(resolved.cards, severalVersionsBySet);
   return {
     rows,
     csv: toCardKingdomCsv(rows),
-    warnings: [...parsed.warnings, ...resolved.warnings],
+    warnings: [...parsed.warnings, ...resolved.warnings, ...sets.warnings],
   };
 }
