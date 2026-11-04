@@ -1,12 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveScryfallIds } from '../js/scryfall.js';
+import { resolveScryfallIds, fetchSetPrintings } from '../js/scryfall.js';
 import { convert } from '../js/convert.js';
 
-/** A fake fetch that answers Scryfall's /cards/collection from a fixed list. */
+/**
+ * A fake fetch that answers Scryfall's /cards/collection and /cards/search
+ * (`e:<set>` queries only) from a fixed list. Only collection calls are recorded.
+ */
 function fakeScryfall(cards) {
   const calls = [];
   const fetchFn = async (url, options) => {
+    if (url.includes('/cards/search')) {
+      const set = new URL(url).searchParams.get('q').replace('e:', '');
+      const data = cards.filter((card) => card.set === set);
+      return data.length === 0
+        ? { ok: false, status: 404 }
+        : { ok: true, status: 200, json: async () => ({ data, has_more: false }) };
+    }
     const { identifiers } = JSON.parse(options.body);
     calls.push(identifiers);
     const data = cards.filter((card) =>
@@ -17,7 +27,13 @@ function fakeScryfall(cards) {
   return { fetchFn, calls };
 }
 
-const scryfallCards = [{ id: 'nelly-id', set: 'mkc', collector_number: '4', set_name: 'Murders at Karlov Manor Commander' }];
+const mkc = { set: 'mkc', set_name: 'Murders at Karlov Manor Commander' };
+const scryfallCards = [
+  { ...mkc, id: 'nelly-id', name: 'Nelly Borca, Impulsive Accuser', collector_number: '4' },
+  { ...mkc, id: 'ransom-45', name: 'Ransom Note', collector_number: '45' },
+  { ...mkc, id: 'ransom-46', name: 'Ransom Note', collector_number: '46' },
+  { ...mkc, id: 'nelly-ext', name: 'Nelly Borca, Impulsive Accuser', collector_number: '300', frame_effects: ['extendedart'] },
+];
 
 test('fills in Scryfall IDs and set names by set code and collector number', async () => {
   const { fetchFn, calls } = fakeScryfall(scryfallCards);
@@ -38,11 +54,38 @@ test('skips the network when every card already has a Scryfall ID', async () => 
 
 test('converts a TXT export end to end', async () => {
   const { fetchFn } = fakeScryfall(scryfallCards);
-  const result = await convert({ fileName: 'deck.TXT', text: '// COMMANDER\n1 Nelly Borca, Impulsive Accuser (MKC) 4 *F*\n', fetchFn });
-  assert.equal(result.csv, '"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander Decks,TRUE,1\n');
+  const text = '// COMMANDER\n1 Nelly Borca, Impulsive Accuser (MKC) 4 *F*\n\n1 Ransom Note (MKC) 45\n';
+  const result = await convert({ fileName: 'deck.TXT', text, fetchFn });
+  assert.equal(
+    result.csv,
+    '"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander Decks,TRUE,1\n' +
+      'Ransom Note (0045),Murders at Karlov Manor Commander Decks,FALSE,1\n',
+  );
   assert.deepEqual(result.warnings, []);
 });
 
 test('rejects other file types', async () => {
   await assert.rejects(convert({ fileName: 'deck.json', text: '' }), /\.csv or \.txt/);
+});
+
+test('fetches every page of a set', async () => {
+  const pages = {
+    first: { data: [{ name: 'A' }], has_more: true, next_page: 'https://api.scryfall.com/cards/search?page=2' },
+    second: { data: [{ name: 'B' }], has_more: false },
+  };
+  const fetchFn = async (url) => ({
+    ok: true,
+    status: 200,
+    json: async () => (url.includes('page=2') ? pages.second : pages.first),
+  });
+  const { printingsBySet, warnings } = await fetchSetPrintings(['MKC', 'MKC'], fetchFn);
+  assert.deepEqual(printingsBySet.get('MKC'), [{ name: 'A' }, { name: 'B' }]);
+  assert.deepEqual(warnings, []);
+});
+
+test('warns instead of failing when a set cannot be loaded', async () => {
+  const fetchFn = async () => ({ ok: false, status: 500 });
+  const { printingsBySet, warnings } = await fetchSetPrintings(['MKC'], fetchFn);
+  assert.equal(printingsBySet.size, 0);
+  assert.equal(warnings.length, 1);
 });
