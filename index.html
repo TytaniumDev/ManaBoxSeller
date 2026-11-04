@@ -10,18 +10,26 @@
   <body>
     <main>
       <h1>ManaBox → Card Kingdom</h1>
-      <p>Drop a ManaBox export (.csv or .txt) to get a Card Kingdom sell-list CSV.</p>
+      <p>
+        Drop one or more ManaBox exports (.csv or .txt) to get a Card Kingdom sell-list CSV.
+        Add more decks any time and they're combined into the same list.
+      </p>
 
       <label id="drop-zone" class="drop-zone">
-        <input id="file-input" type="file" accept=".csv,.txt" hidden />
-        <span>Drop a file here, or click to choose one</span>
+        <input id="file-input" type="file" accept=".csv,.txt" multiple hidden />
+        <span>Drop files here, or click to choose them</span>
       </label>
 
       <p id="status" role="status"></p>
       <ul id="warnings" class="warnings"></ul>
 
       <section id="result" hidden>
-        <button id="download" type="button">Download Card Kingdom CSV</button>
+        <h2>Decks</h2>
+        <ul id="decks" class="decks"></ul>
+        <div class="actions">
+          <button id="download" type="button">Download Card Kingdom CSV</button>
+          <button id="clear" type="button">Clear all</button>
+        </div>
         <table>
           <thead>
             <tr><th>Name</th><th>Set</th><th>Foil</th><th>Qty</th></tr>

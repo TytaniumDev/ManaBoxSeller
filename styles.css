@@ -50,3 +50,14 @@ td {
   border-bottom: 1px solid var(--border);
   text-align: left;
 }
+
+.decks button {
+  margin-left: 8px;
+  padding: 2px 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
