@@ -10,7 +10,10 @@ A small static site that converts a [ManaBox](https://manabox.app) export
    version of the deck's card names in their sets, e.g. `(e:mkc (!"Ransom Note" or !"Plains"))`,
    a few requests per deck at most. `.txt` exports only have set codes, so their set names come
    from the same results; the [collection endpoint](https://scryfall.com/docs/api/cards/collection)
-   is only used for any card the search missed. Answers are remembered for the rest of the visit.
+   is only used for any card the search missed. Files dropped together share one lookup
+   (`convertAll` in `js/convert.js`), and answers are kept in localStorage for a week
+   (`js/stored-cache.js`), so converting the same cards again makes no requests. This keeps the
+   site gentle on Scryfall's free API.
 3. **Translate names** to Card Kingdom's conventions (`js/card-kingdom-names.js`):
    precon sets like `Murders at Karlov Manor Commander` become `... Commander Decks`, and
    cards with several versions in one set (basic lands, or e.g. the four Ransom Note arts in
