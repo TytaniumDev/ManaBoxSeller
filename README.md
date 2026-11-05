@@ -21,6 +21,14 @@ A small static site that converts a [ManaBox](https://manabox.app) export
    Step 2's search results tell the site which cards need this.
 4. **Write** the Card Kingdom CSV: no header, `name, set, TRUE/FALSE foil, quantity`,
    with duplicates merged (`js/card-kingdom.js`).
+5. **Check Card Kingdom's buylist** (`js/card-kingdom-buylist.js`). The page downloads Card
+   Kingdom's public price list (`api.cardkingdom.com/api/v2/pricelist`, about 10 MB gzipped,
+   refreshed daily) once per visit, alongside the Scryfall lookups, and matches cards by
+   Scryfall ID and foil. Cards Card Kingdom is buying go in the CK CSV with their near-mint cash
+   price and a total; everything else, including copies beyond what CK wants, goes in a
+   leftovers CSV in ManaBox's format (`toManaboxCsv` in `js/manabox-csv.js`) to upload to
+   CardConduit. If the download fails, every card stays in the CK CSV. A checklist with
+   spinners shows each step while it runs (`js/progress-steps.js`).
 
 You can drop several exports at once, or add more after converting. Each file becomes a deck
 in the page's list, and the download combines all of them, summing identical cards

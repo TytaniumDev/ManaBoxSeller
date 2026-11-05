@@ -27,5 +27,7 @@ export function combineDecks(decks) {
   const rows = mergeRows(decks.flatMap((deck) => deck.rows));
   const fileName =
     decks.length === 1 ? `${decks[0].name} - Card Kingdom.csv` : `Card Kingdom sell list (${decks.length} decks).csv`;
-  return { rows, csv: toCardKingdomCsv(rows), fileName };
+  const leftoversFileName =
+    decks.length === 1 ? `${decks[0].name} - Leftovers.csv` : `Leftovers (${decks.length} decks).csv`;
+  return { rows, csv: toCardKingdomCsv(rows), fileName, leftoversFileName };
 }

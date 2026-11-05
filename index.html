@@ -11,8 +11,9 @@
     <main>
       <h1>ManaBox → Card Kingdom</h1>
       <p>
-        Drop one or more ManaBox exports (.csv or .txt) to get a Card Kingdom sell-list CSV.
-        Add more decks any time and they're combined into the same list.
+        Drop one or more ManaBox exports (.csv or .txt) to get a Card Kingdom sell-list CSV
+        with only the cards Card Kingdom is buying, plus a leftovers CSV for CardConduit.
+        Add more decks any time and they're combined into the same lists.
       </p>
 
       <label id="drop-zone" class="drop-zone">
@@ -20,6 +21,7 @@
         <span>Drop files here, or click to choose them</span>
       </label>
 
+      <ol id="steps" class="steps" aria-live="polite" hidden></ol>
       <p id="status" role="status"></p>
       <ul id="warnings" class="warnings"></ul>
 
@@ -27,15 +29,34 @@
         <h2>Decks</h2>
         <ul id="decks" class="decks"></ul>
         <div class="actions">
-          <button id="download" type="button">Download Card Kingdom CSV</button>
           <button id="clear" type="button">Clear all</button>
+        </div>
+
+        <h2 id="selling-heading">Card Kingdom is buying</h2>
+        <p id="selling-summary"></p>
+        <div class="actions">
+          <button id="download" type="button">Download Card Kingdom CSV</button>
         </div>
         <table>
           <thead>
-            <tr><th>Name</th><th>Set</th><th>Foil</th><th>Qty</th></tr>
+            <tr><th>Name</th><th>Set</th><th>Foil</th><th>Qty</th><th>Each</th></tr>
           </thead>
-          <tbody id="preview"></tbody>
+          <tbody id="selling"></tbody>
         </table>
+
+        <div id="leftovers-section">
+          <h2>Leftovers for CardConduit</h2>
+          <p id="leftovers-summary"></p>
+          <div class="actions">
+            <button id="download-leftovers" type="button">Download leftovers CSV</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Set</th><th>Foil</th><th>Qty</th></tr>
+            </thead>
+            <tbody id="leftovers"></tbody>
+          </table>
+        </div>
       </section>
     </main>
   </body>
