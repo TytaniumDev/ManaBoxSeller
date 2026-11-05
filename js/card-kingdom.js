@@ -1,5 +1,5 @@
 import { toCsv } from './csv.js';
-import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
+import { productKey } from './card-kingdom-buylist.js';
 
 /**
  * @typedef {object} CardKingdomRow
@@ -8,33 +8,38 @@ import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
  * @property {boolean} foil
  * @property {number} quantity
  * @property {Omit<import('./card.js').Card, 'quantity'>} [printing]
- *   the ManaBox card this row came from, used to look it up on Card Kingdom's
- *   buylist and to write leftovers back out in ManaBox's format
+ *   the ManaBox card this row came from, used to write leftovers back out
+ *   in ManaBox's format
+ * @property {import('./card-kingdom-buylist.js').CardKingdomProduct} [product]
+ *   Card Kingdom's listing for this card, if they stock it
  */
 
 /**
- * Converts cards to Card Kingdom sell-list rows, translating names to
- * Card Kingdom's conventions. Cards with the same name, set and foil are
- * merged and their quantities summed.
+ * Converts cards to Card Kingdom sell-list rows, using Card Kingdom's own
+ * name and edition for each printing, e.g. "Ransom Note (0045)" in
+ * "Murders at Karlov Manor Commander Decks". Cards Card Kingdom doesn't
+ * list keep their ManaBox name and set. Rows with the same name, edition
+ * and foil are merged and their quantities summed.
  *
  * @param {import('./card.js').Card[]} cards
- * @param {Map<string, Set<string>>} [severalVersionsBySet] set code → names
- *   with several versions in that set, from findNamesWithSeveralVersions
+ * @param {Map<string, import('./card-kingdom-buylist.js').CardKingdomProduct>} products
+ *   from Card Kingdom's price list, keyed by productKey
  * @returns {CardKingdomRow[]}
  */
-export function toCardKingdomRows(cards, severalVersionsBySet = new Map()) {
+export function toCardKingdomRows(cards, products) {
   return mergeRows(
-    cards.map(({ quantity, ...printing }) => ({
-      name: cardKingdomTitle(
-        printing.name,
-        printing.collectorNumber,
-        severalVersionsBySet.get(printing.setCode)?.has(printing.name),
-      ),
-      edition: printing.setName ? cardKingdomEdition(printing.setName) : printing.setCode,
-      foil: printing.finish !== 'normal',
-      quantity,
-      printing,
-    })),
+    cards.map(({ quantity, ...printing }) => {
+      const foil = printing.finish !== 'normal';
+      const product = printing.scryfallId ? products.get(productKey(printing.scryfallId, foil)) : undefined;
+      return {
+        name: product?.title ?? printing.name,
+        edition: product?.edition ?? printing.setName ?? printing.setCode,
+        foil,
+        quantity,
+        printing,
+        product,
+      };
+    }),
   );
 }
 

@@ -4,61 +4,70 @@
  */
 export class ProgressSteps {
   /**
-   * Replaces the list's contents with the given steps, all waiting.
+   * Empties the list and shows it.
    *
    * @param {HTMLOListElement | HTMLUListElement} list
-   * @param {string[]} labels
    */
-  constructor(list, labels) {
-    this.items = labels.map((label) => Object.assign(document.createElement('li'), { textContent: label }));
-    list.replaceChildren(...this.items);
+  constructor(list) {
+    this.list = list;
+    list.replaceChildren();
     list.hidden = false;
   }
 
-  /** @param {number} index */
-  start(index) {
-    this.#set(index, 'running');
-  }
-
   /**
-   * @param {number} index
-   * @param {string} [label] replaces the step's text, e.g. to add a result
+   * Adds a waiting step to the end of the list.
+   *
+   * @param {string} label
+   * @returns {Step}
    */
-  done(index, label) {
-    this.#set(index, 'done', label);
+  add(label) {
+    const item = Object.assign(document.createElement('li'), { textContent: label });
+    this.list.append(item);
+    return new Step(item);
+  }
+}
+
+export class Step {
+  /** @param {HTMLLIElement} item */
+  constructor(item) {
+    this.item = item;
+  }
+
+  start() {
+    this.#set('running');
+  }
+
+  /** @param {string} [label] replaces the step's text, e.g. to add a result */
+  done(label) {
+    this.#set('done', label);
+  }
+
+  /** @param {string} [label] */
+  fail(label) {
+    this.#set('failed', label);
   }
 
   /**
-   * @param {number} index
-   * @param {string} [label]
-   */
-  fail(index, label) {
-    this.#set(index, 'failed', label);
-  }
-
-  /**
-   * Runs `work` as step `index`: shows the spinner, then done or failed.
+   * Runs `work` as this step: shows the spinner, then done or failed.
    *
    * @template T
-   * @param {number} index
    * @param {() => Promise<T>} work
    * @returns {Promise<T>}
    */
-  async run(index, work) {
-    this.start(index);
+  async run(work) {
+    this.start();
     try {
       const result = await work();
-      this.done(index);
+      this.done();
       return result;
     } catch (error) {
-      this.fail(index);
+      this.fail();
       throw error;
     }
   }
 
-  #set(index, state, label) {
-    const item = this.items[index];
-    item.className = state;
-    if (label) item.textContent = label;
+  #set(state, label) {
+    this.item.className = state;
+    if (label) this.item.textContent = label;
   }
 }
