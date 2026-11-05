@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseManaboxCsv } from '../js/manabox-csv.js';
+import { parseManaboxCsv, toManaboxCsv } from '../js/manabox-csv.js';
 import { parseManaboxTxt } from '../js/manabox-txt.js';
 import { readSample } from './helpers.js';
 
@@ -56,4 +56,12 @@ test('TXT warns about unreadable lines instead of failing', () => {
   assert.equal(cards.length, 2);
   assert.equal(cards[1].finish, 'etched');
   assert.deepEqual(warnings, ['Line 2: skipped, couldn\'t read "not a card".']);
+});
+
+test('toManaboxCsv writes cards that parseManaboxCsv reads back', () => {
+  const { cards } = parseManaboxCsv(readSample('Blame Game.csv'));
+  const csv = toManaboxCsv(cards);
+  assert.match(csv, /^Name,Set code,Set name,Collector number,Foil,Quantity,Scryfall ID\n/);
+  assert.match(csv, /^"Nelly Borca, Impulsive Accuser",MKC,Murders at Karlov Manor Commander,4,foil,1,/m);
+  assert.deepEqual(parseManaboxCsv(csv), { cards, warnings: [] });
 });

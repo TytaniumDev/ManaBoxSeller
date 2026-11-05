@@ -1,4 +1,4 @@
-import { parseCsv } from './csv.js';
+import { parseCsv, toCsv } from './csv.js';
 import { toFinish } from './card.js';
 
 /** ManaBox CSV header names this parser reads. */
@@ -58,4 +58,16 @@ export function parseManaboxCsv(text) {
     });
   });
   return { cards, warnings };
+}
+
+/**
+ * Writes cards as a ManaBox-style CSV with just the columns {@link parseManaboxCsv}
+ * reads, so other sites that take ManaBox exports (e.g. CardConduit) can read it.
+ *
+ * @param {import('./card.js').Card[]} cards
+ * @returns {string}
+ */
+export function toManaboxCsv(cards) {
+  const keys = /** @type {Array<keyof typeof COLUMNS>} */ (Object.keys(COLUMNS));
+  return toCsv([keys.map((key) => COLUMNS[key]), ...cards.map((card) => keys.map((key) => card[key] ?? ''))]);
 }

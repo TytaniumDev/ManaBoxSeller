@@ -61,3 +61,66 @@ td {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.steps {
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  opacity: 0.6;
+}
+
+.steps li::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.steps li.running,
+.steps li.done,
+.steps li.failed {
+  opacity: 1;
+}
+
+.steps li.running::before {
+  border-color: var(--border);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+
+.steps li.done::before {
+  content: '✓';
+  border: none;
+  color: #2a9d4b;
+  font-weight: bold;
+  line-height: 14px;
+}
+
+.steps li.failed::before {
+  content: '✕';
+  border: none;
+  color: #c0392b;
+  font-weight: bold;
+  line-height: 14px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steps li.running::before {
+    animation-duration: 2.4s;
+  }
+}

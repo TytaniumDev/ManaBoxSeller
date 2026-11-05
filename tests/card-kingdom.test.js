@@ -19,8 +19,14 @@ test('merges duplicates by name, set and foil', () => {
     { ...nelly, finish: 'normal', quantity: 1 },
   ]);
   assert.deepEqual(rows, [
-    { name: nelly.name, edition: 'Murders at Karlov Manor Commander Decks', foil: true, quantity: 3 },
-    { name: nelly.name, edition: 'Murders at Karlov Manor Commander Decks', foil: false, quantity: 1 },
+    { name: nelly.name, edition: 'Murders at Karlov Manor Commander Decks', foil: true, quantity: 3, printing: nelly },
+    {
+      name: nelly.name,
+      edition: 'Murders at Karlov Manor Commander Decks',
+      foil: false,
+      quantity: 1,
+      printing: { ...nelly, finish: 'normal' },
+    },
   ]);
 });
 

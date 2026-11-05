@@ -15,6 +15,17 @@ test('a single deck keeps its name in the file name', () => {
   assert.equal(fileName, 'Blame Game - Card Kingdom.csv');
 });
 
+test('names the leftovers file after the decks', () => {
+  assert.equal(combineDecks([{ name: 'Blame Game', rows: [] }]).leftoversFileName, 'Blame Game - Leftovers.csv');
+  assert.equal(
+    combineDecks([
+      { name: 'A', rows: [] },
+      { name: 'B', rows: [] },
+    ]).leftoversFileName,
+    'Leftovers (2 decks).csv',
+  );
+});
+
 test('combines decks, summing identical cards and keeping foils separate', () => {
   const first = { name: 'A', rows: [row('Shock', 1), row('Mountain (0283)', 7)] };
   const second = { name: 'B', rows: [row('Shock', 2), row('Shock', 1, true)] };

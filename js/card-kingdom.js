@@ -7,6 +7,9 @@ import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
  * @property {string} edition
  * @property {boolean} foil
  * @property {number} quantity
+ * @property {Omit<import('./card.js').Card, 'quantity'>} [printing]
+ *   the ManaBox card this row came from, used to look it up on Card Kingdom's
+ *   buylist and to write leftovers back out in ManaBox's format
  */
 
 /**
@@ -21,15 +24,16 @@ import { cardKingdomEdition, cardKingdomTitle } from './card-kingdom-names.js';
  */
 export function toCardKingdomRows(cards, severalVersionsBySet = new Map()) {
   return mergeRows(
-    cards.map((card) => ({
+    cards.map(({ quantity, ...printing }) => ({
       name: cardKingdomTitle(
-        card.name,
-        card.collectorNumber,
-        severalVersionsBySet.get(card.setCode)?.has(card.name),
+        printing.name,
+        printing.collectorNumber,
+        severalVersionsBySet.get(printing.setCode)?.has(printing.name),
       ),
-      edition: card.setName ? cardKingdomEdition(card.setName) : card.setCode,
-      foil: card.finish !== 'normal',
-      quantity: card.quantity,
+      edition: printing.setName ? cardKingdomEdition(printing.setName) : printing.setCode,
+      foil: printing.finish !== 'normal',
+      quantity,
+      printing,
     })),
   );
 }
