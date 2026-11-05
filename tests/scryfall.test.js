@@ -1,34 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveScryfallIds, fetchPrintingsByName, buildNameQueries } from '../js/scryfall.js';
-import { convert, convertAll } from '../js/convert.js';
-
-/** Reads the set/name pairs back out of a buildNameQueries query. */
-function parseNameQuery(query) {
-  const pairs = [];
-  for (const [, set, names] of query.matchAll(/e:(\w+) ([^]*?)(?=\) or \(e:|\)$)/g)) {
-    for (const [, name] of names.matchAll(/!"((?:[^"\\]|\\.)*)"/g)) pairs.push({ set, name: name.replaceAll('\\"', '"') });
-  }
-  return pairs;
-}
+import { resolveScryfallIds } from '../js/scryfall.js';
+import { readDecks } from '../js/convert.js';
+import { readSample } from './helpers.js';
 
 /**
- * A fake fetch that answers Scryfall's /cards/collection and /cards/search
- * (name queries from buildNameQueries) from a fixed list. Collection calls
- * are recorded in `calls`, searches in `searches`.
+ * A fake fetch that answers Scryfall's /cards/collection from a fixed list
+ * and records each request's identifiers in `calls`.
  */
 function fakeScryfall(cards) {
   const calls = [];
-  const searches = [];
   const fetchFn = async (url, options) => {
-    if (url.includes('/cards/search')) {
-      const pairs = parseNameQuery(new URL(url).searchParams.get('q'));
-      searches.push(pairs);
-      const data = cards.filter((card) => pairs.some((pair) => pair.set === card.set && pair.name === card.name));
-      return data.length === 0
-        ? { ok: false, status: 404 }
-        : { ok: true, status: 200, json: async () => ({ data, has_more: false }) };
-    }
     const { identifiers } = JSON.parse(options.body);
     calls.push(identifiers);
     const data = cards.filter((card) =>
@@ -36,131 +18,66 @@ function fakeScryfall(cards) {
     );
     return { ok: true, json: async () => ({ data }) };
   };
-  return { fetchFn, calls, searches };
+  return { fetchFn, calls };
 }
 
 const mkc = { set: 'mkc', set_name: 'Murders at Karlov Manor Commander' };
 const scryfallCards = [
-  { ...mkc, id: 'nelly-id', name: 'Nelly Borca, Impulsive Accuser', collector_number: '4' },
-  { ...mkc, id: 'ransom-45', name: 'Ransom Note', collector_number: '45' },
-  { ...mkc, id: 'ransom-46', name: 'Ransom Note', collector_number: '46' },
-  { ...mkc, id: 'nelly-ext', name: 'Nelly Borca, Impulsive Accuser', collector_number: '300', frame_effects: ['extendedart'] },
+  { ...mkc, id: 'nelly-id', collector_number: '4' },
+  { ...mkc, id: 'ransom-45', collector_number: '45' },
 ];
+const nelly = { name: 'Nelly', setCode: 'MKC', collectorNumber: '4', finish: 'foil', quantity: 1 };
 
 test('fills in Scryfall IDs and set names by set code and collector number', async () => {
   const { fetchFn, calls } = fakeScryfall(scryfallCards);
-  const card = { name: 'Nelly', setCode: 'MKC', collectorNumber: '4', finish: 'foil', quantity: 1 };
-  const { cards, warnings } = await resolveScryfallIds([card, { ...card }, { ...card, collectorNumber: '999' }], fetchFn);
+  const { cards, warnings } = await resolveScryfallIds([nelly, { ...nelly }, { ...nelly, collectorNumber: '999' }], fetchFn);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].length, 2, 'duplicate printings are requested once');
   assert.equal(cards[0].scryfallId, 'nelly-id');
   assert.equal(cards[1].setName, 'Murders at Karlov Manor Commander');
-  assert.equal(warnings.length, 1);
+  assert.deepEqual(warnings, ['Nelly (MKC 999) wasn\'t found on Scryfall.']);
 });
 
 test('skips the network when every card already has a Scryfall ID', async () => {
   const { fetchFn, calls } = fakeScryfall([]);
-  await resolveScryfallIds([{ name: 'x', setCode: 'A', collectorNumber: '1', finish: 'normal', quantity: 1, scryfallId: 'id' }], fetchFn);
+  await resolveScryfallIds([{ ...nelly, scryfallId: 'id' }], fetchFn);
   assert.equal(calls.length, 0);
 });
 
-test('converts a TXT export end to end with a single search', async () => {
-  const { fetchFn, calls, searches } = fakeScryfall(scryfallCards);
-  const text = '// COMMANDER\n1 Nelly Borca, Impulsive Accuser (MKC) 4 *F*\n\n1 Ransom Note (MKC) 45\n';
-  const result = await convert({ fileName: 'deck.TXT', text, fetchFn });
-  assert.equal(
-    result.csv,
-    '"Nelly Borca, Impulsive Accuser",Murders at Karlov Manor Commander Decks,TRUE,1\n' +
-      'Ransom Note (0045),Murders at Karlov Manor Commander Decks,FALSE,1\n',
-  );
-  assert.deepEqual(result.warnings, []);
-  assert.equal(searches.length, 1);
-  assert.equal(calls.length, 0, 'set names came from the search, so no collection lookup');
-});
-
-test('falls back to the collection lookup for .txt cards the name search missed', async () => {
-  // Scryfall knows this card by its full double-faced name, so a search
-  // for the front face alone finds nothing.
-  const dfc = { ...mkc, id: 'dfc-id', name: 'Front // Back', collector_number: '7' };
-  const { fetchFn, calls } = fakeScryfall([...scryfallCards, dfc]);
-  const result = await convert({ fileName: 'deck.txt', text: '1 Front (MKC) 7\n', fetchFn });
-  assert.equal(calls.length, 1);
-  assert.equal(result.rows[0].edition, 'Murders at Karlov Manor Commander Decks');
-});
-
-test('rejects other file types', async () => {
-  await assert.rejects(convert({ fileName: 'deck.json', text: '' }), /\.csv or \.txt/);
-});
-
-test('fetches every page of a search', async () => {
-  const pages = {
-    first: { data: [{ set: 'mkc', name: 'A' }], has_more: true, next_page: 'https://api.scryfall.com/cards/search?page=2' },
-    second: { data: [{ set: 'mkc', name: 'A', collector_number: '2' }], has_more: false },
-  };
-  const fetchFn = async (url) => ({
-    ok: true,
-    status: 200,
-    json: async () => (url.includes('page=2') ? pages.second : pages.first),
-  });
-  const { printingsBySet, warnings } = await fetchPrintingsByName([{ setCode: 'MKC', name: 'A' }], fetchFn);
-  assert.equal(printingsBySet.get('MKC').length, 2);
-  assert.deepEqual(warnings, []);
-});
-
-test('looks up only the deck\'s names, once each, and reuses the cache', async () => {
-  const { fetchFn, searches } = fakeScryfall(scryfallCards);
-  const deck = [
-    { setCode: 'MKC', name: 'Ransom Note' },
-    { setCode: 'MKC', name: 'Ransom Note' },
-    { setCode: 'MKC', name: 'Not On Scryfall' },
-  ];
+test('reuses cached printings instead of asking Scryfall again', async () => {
+  const { fetchFn, calls } = fakeScryfall(scryfallCards);
   const cache = new Map();
-  const { printingsBySet } = await fetchPrintingsByName(deck, fetchFn, cache);
-  assert.deepEqual(searches, [[{ set: 'mkc', name: 'Ransom Note' }, { set: 'mkc', name: 'Not On Scryfall' }]]);
-  assert.deepEqual(printingsBySet.get('MKC').map((p) => p.collector_number), ['45', '46']);
-
-  await fetchPrintingsByName(deck, fetchFn, cache);
-  assert.equal(searches.length, 1, 'second call is served from the cache');
+  await resolveScryfallIds([nelly], fetchFn, cache);
+  const { cards } = await resolveScryfallIds([nelly], fetchFn, cache);
+  assert.equal(calls.length, 1);
+  assert.equal(cards[0].scryfallId, 'nelly-id');
 });
 
-test('warns instead of failing when a search fails', async () => {
+test('reports a failed Scryfall request', async () => {
   const fetchFn = async () => ({ ok: false, status: 500 });
-  const { printingsBySet, warnings } = await fetchPrintingsByName([{ setCode: 'MKC', name: 'A' }], fetchFn);
-  assert.equal(printingsBySet.size, 0);
-  assert.equal(warnings.length, 1);
+  await assert.rejects(resolveScryfallIds([nelly], fetchFn), /Scryfall request failed \(500\)/);
 });
 
-test('builds name queries grouped by set and split by length', () => {
-  const cards = [
-    { setCode: 'MKC', name: 'Ransom Note' },
-    { setCode: 'MKC', name: 'Plains' },
-    { setCode: 'MKM', name: 'Say "Hi"' },
-  ];
-  assert.deepEqual(
-    buildNameQueries(cards).map((q) => q.text),
-    ['(e:mkc (!"Ransom Note" or !"Plains")) or (e:mkm !"Say \\"Hi\\"")'],
-  );
-  const split = buildNameQueries(cards, 40);
-  assert.ok(split.length > 1);
-  assert.ok(split.every((q) => q.text.length <= 40));
-  assert.deepEqual(split.flatMap((q) => q.cards), cards);
-  for (const query of split) assert.deepEqual(parseNameQuery(query.text), query.cards.map((c) => ({ set: c.setCode.toLowerCase(), name: c.name })));
-});
-
-test('converts several files with one shared search', async () => {
-  const { fetchFn, calls, searches } = fakeScryfall(scryfallCards);
-  const { decks, warnings } = await convertAll(
+test('reads several files with one shared lookup, keeping a bad file separate', async () => {
+  const { fetchFn, calls } = fakeScryfall(scryfallCards);
+  const { decks, warnings } = await readDecks(
     [
-      { fileName: 'a.txt', text: '1 Ransom Note (MKC) 45\n' },
-      { fileName: 'b.txt', text: '2 Ransom Note (MKC) 46\n1 Nelly Borca, Impulsive Accuser (MKC) 4\n' },
+      { fileName: 'a.txt', text: '1 Nelly (MKC) 4 *F*\n' },
+      { fileName: 'b.txt', text: '2 Ransom Note (MKC) 45\n' },
       { fileName: 'c.json', text: '' },
     ],
     { fetchFn },
   );
-  assert.equal(searches.length, 1);
-  assert.equal(calls.length, 0);
+  assert.equal(calls.length, 1);
   assert.deepEqual(warnings, []);
-  assert.deepEqual(decks[0].rows.map((row) => row.name), ['Ransom Note (0045)']);
-  assert.deepEqual(decks[1].rows.map((row) => row.name), ['Nelly Borca, Impulsive Accuser', 'Ransom Note (0046)']);
+  assert.equal(decks[0].cards[0].scryfallId, 'nelly-id');
+  assert.equal(decks[1].cards[0].scryfallId, 'ransom-45');
   assert.match(decks[2].error.message, /\.csv or \.txt/);
+});
+
+test('a CSV export needs no Scryfall requests', async () => {
+  const { fetchFn, calls } = fakeScryfall([]);
+  const { decks } = await readDecks([{ fileName: 'Blame Game.csv', text: readSample('Blame Game.csv') }], { fetchFn });
+  assert.equal(calls.length, 0);
+  assert.equal(decks[0].cards.length, 86);
 });

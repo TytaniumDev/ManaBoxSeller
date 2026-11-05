@@ -1,8 +1,8 @@
-import { convertAll } from './convert.js';
+import { readDecks } from './convert.js';
 import { combineDecks, deckName } from './sell-list.js';
 import { StoredCache } from './stored-cache.js';
 import { fetchBuylist, splitByBuylist, formatDollars } from './card-kingdom-buylist.js';
-import { toCardKingdomCsv } from './card-kingdom.js';
+import { toCardKingdomRows, toCardKingdomCsv } from './card-kingdom.js';
 import { toManaboxCsv } from './manabox-csv.js';
 import { ProgressSteps } from './progress-steps.js';
 
@@ -13,10 +13,8 @@ const status = document.querySelector('#status');
 const warningList = document.querySelector('#warnings');
 const result = document.querySelector('#result');
 const deckList = document.querySelector('#decks');
-const sellingHeading = document.querySelector('#selling-heading');
 const sellingSummary = document.querySelector('#selling-summary');
 const sellingTable = document.querySelector('#selling');
-const leftoversSection = document.querySelector('#leftovers-section');
 const leftoversSummary = document.querySelector('#leftovers-summary');
 const leftoversTable = document.querySelector('#leftovers');
 const downloadButton = document.querySelector('#download');
@@ -26,13 +24,14 @@ const clearButton = document.querySelector('#clear');
 /** @type {import('./sell-list.js').Deck[]} */
 let decks = [];
 /**
- * Scryfall lookups, kept for a week across visits so repeat decks don't
- * hit Scryfall again (Scryfall asks clients to cache for at least a day).
+ * Scryfall IDs for .txt cards, kept for a week across visits so repeat
+ * decks don't hit Scryfall again (Scryfall asks clients to cache for at
+ * least a day).
  */
-const printingsCache = new StoredCache('scryfall-printings-v1', 7 * 24 * 60 * 60 * 1000);
+const idCache = new StoredCache('scryfall-ids-v1', 7 * 24 * 60 * 60 * 1000);
 /**
- * Card Kingdom's buylist, downloaded once per visit. Undefined until it
- * loads, or if it couldn't be loaded (then everything goes in the CK list).
+ * Card Kingdom's buylist, downloaded once per visit. Every deck in the
+ * list was named and priced from it.
  *
  * @type {import('./card-kingdom-buylist.js').Buylist | undefined}
  */
@@ -69,9 +68,9 @@ clearButton.addEventListener('click', () => {
 });
 
 /**
- * Converts the files together, so they share Scryfall lookups, and adds
- * them to the sell list. Card Kingdom's buylist downloads alongside the
- * Scryfall lookups the first time.
+ * Reads the files, looks up any .txt cards on Scryfall while Card Kingdom's
+ * buylist downloads (the first time), then names and prices every card
+ * from the buylist and adds the decks to the sell list.
  *
  * @param {File[]} files
  */
@@ -79,64 +78,61 @@ async function addFiles(files) {
   if (files.length === 0) return;
   warningList.replaceChildren();
   status.textContent = '';
-  const steps = new ProgressSteps(stepList, [
-    files.length === 1 ? `Read ${files[0].name}` : `Read ${files.length} files`,
-    'Look up cards on Scryfall',
+  const steps = new ProgressSteps(stepList);
+  const readStep = steps.add(files.length === 1 ? `Read ${files[0].name}` : `Read ${files.length} files`);
+  const hasTxt = files.some((file) => /\.txt$/i.test(file.name));
+  const scryfallStep = hasTxt ? steps.add('Look up .txt cards on Scryfall') : undefined;
+  const buylistStep = steps.add(
     buylist ? 'Card Kingdom buylist already downloaded' : 'Download Card Kingdom buylist (about 10 MB)',
-    'Check which cards Card Kingdom is buying',
-  ]);
-  const warnings = [];
+  );
+  const matchStep = steps.add('Match cards to Card Kingdom’s names and prices');
 
   try {
-    const inputs = await steps.run(0, () =>
+    const inputs = await readStep.run(() =>
       Promise.all(files.map(async (file) => ({ fileName: file.name, text: await file.text() }))),
     );
-    const [converted] = await Promise.all([
-      steps.run(1, () => convertAll(inputs, { printingsCache })),
-      loadBuylist(steps, 2).catch((error) => {
-        warnings.push(`Couldn't download Card Kingdom's buylist (${error.message}); every card is in the Card Kingdom list.`);
-      }),
-    ]);
+    const readAll = () => readDecks(inputs, { idCache });
+    const [read] = await Promise.all([scryfallStep ? scryfallStep.run(readAll) : readAll(), loadBuylist(buylistStep)]);
 
-    steps.start(3);
-    warnings.push(...converted.warnings);
+    matchStep.start();
     const failures = [];
-    for (const deck of converted.decks) {
+    const warnings = [...read.warnings];
+    for (const deck of read.decks) {
       if (deck.error) {
         failures.push(`${deck.fileName}: ${deck.error.message}`);
         continue;
       }
-      decks = [...decks, { name: deckName(deck.fileName), rows: deck.rows }];
+      decks = [...decks, { name: deckName(deck.fileName), rows: toCardKingdomRows(deck.cards, buylist.products) }];
       warnings.push(...deck.warnings.map((text) => `${deck.fileName}: ${text}`));
     }
-    render();
-    if (buylist) steps.done(3);
-    else steps.fail(3, 'Couldn’t check which cards Card Kingdom is buying');
+    matchStep.done();
     showWarnings([...failures, ...warnings]);
   } catch (error) {
-    showWarnings([...warnings, error.message]);
-    render();
+    showWarnings([`${error.message} Nothing was added; try the files again.`]);
   }
+  render();
   status.textContent = summary();
 }
 
-/**
- * @param {ProgressSteps} steps
- * @param {number} step
- */
-async function loadBuylist(steps, step) {
+/** @param {import('./progress-steps.js').Step} step */
+async function loadBuylist(step) {
   if (buylist) {
-    steps.done(step);
+    step.done();
     return;
   }
-  buylist = await steps.run(step, () => fetchBuylist());
+  buylist = await step.run(async () => {
+    try {
+      return await fetchBuylist();
+    } catch (error) {
+      throw new Error(`Couldn't download Card Kingdom's buylist (${error.message}).`);
+    }
+  });
 }
 
 /** The combined decks, split by what Card Kingdom is buying. */
 function sellList() {
   const combined = combineDecks(decks);
-  if (!buylist) return { ...combined, selling: combined.rows, leftovers: [], totalCents: undefined };
-  return { ...combined, ...splitByBuylist(combined.rows, buylist.offers) };
+  return { ...combined, ...splitByBuylist(combined.rows) };
 }
 
 function summary() {
@@ -150,16 +146,12 @@ function render() {
   result.hidden = decks.length === 0;
   showDecks();
 
+  if (decks.length === 0) return;
   const { selling, leftovers, totalCents } = sellList();
-  sellingHeading.textContent = buylist ? 'Card Kingdom is buying' : 'Card Kingdom sell list';
-  sellingSummary.textContent =
-    totalCents === undefined
-      ? `${countCards(selling)} cards. Prices unavailable.`
-      : `${countCards(selling)} cards for ${formatDollars(totalCents)} cash (near mint, prices from ${buylist.updatedAt ?? 'today'}).`;
+  sellingSummary.textContent = `${countCards(selling)} cards for ${formatDollars(totalCents)} cash (near mint, prices from ${buylist.updatedAt ?? 'today'}).`;
   downloadButton.disabled = selling.length === 0;
   showRows(sellingTable, selling, (row) => [formatDollars(row.priceCents)]);
 
-  leftoversSection.hidden = !buylist;
   leftoversSummary.textContent = `${countCards(leftovers)} cards Card Kingdom isn't buying, in ManaBox's CSV format.`;
   downloadLeftoversButton.disabled = leftovers.length === 0;
   showRows(leftoversTable, leftovers);

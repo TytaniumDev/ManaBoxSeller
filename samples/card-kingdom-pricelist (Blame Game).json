@@ -1,0 +1,809 @@
+{
+ "meta": {
+  "created_at": "2026-11-05 09:11:52",
+  "base_url": "https://www.cardkingdom.com/"
+ },
+ "data": [
+  {
+   "scryfall_id": "81a1a8a6-916b-4eef-8079-6775afcb63cf",
+   "name": "Plains",
+   "variation": "0277",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "de754d20-5371-456b-9064-8f0687d2eab7",
+   "name": "Mountain",
+   "variation": "0283",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "2ef59aa9-f5e1-413a-869b-d287db95efd0",
+   "name": "Nelly Borca, Impulsive Accuser",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "true",
+   "price_buy": "0.38",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "93ddde4f-d35e-4128-8f43-d0eadbd715de",
+   "name": "Escape Tunnel",
+   "variation": "",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "false",
+   "price_buy": "0.02",
+   "qty_buying": 76
+  },
+  {
+   "scryfall_id": "bdadc60f-942f-47e2-b8fc-51deb3d0b86d",
+   "name": "Immortal Obligation",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.20",
+   "qty_buying": 47
+  },
+  {
+   "scryfall_id": "b50bfde2-6c2d-403e-ab47-c932bcb2116d",
+   "name": "Otherworldly Escort",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "960b84b6-febf-4926-9c7b-05efa0e0e11f",
+   "name": "Redemption Arc",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.05",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "0f61e93f-5f97-4c7d-b3d5-0e05242faeb3",
+   "name": "Trouble in Pairs",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "26.00",
+   "qty_buying": 33
+  },
+  {
+   "scryfall_id": "17054e75-d801-4962-83c1-0b52e7b65f66",
+   "name": "Havoc Eater",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.30",
+   "qty_buying": 35
+  },
+  {
+   "scryfall_id": "bbba7b9f-d944-4987-b60d-34733382ec53",
+   "name": "Hot Pursuit",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.15",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "e9bdc40b-ab7a-44a4-afb5-41b6fc2dffdc",
+   "name": "Mob Verdict",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.25",
+   "qty_buying": 41
+  },
+  {
+   "scryfall_id": "d678e736-7c29-433a-9a2a-b78749252377",
+   "name": "Prisoner's Dilemma",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.50",
+   "qty_buying": 28
+  },
+  {
+   "scryfall_id": "88158a11-a44e-49b4-8ae3-d81c14265802",
+   "name": "Ransom Note",
+   "variation": "0045",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "97425844-dd1b-4f3c-985c-e198e8b9a16b",
+   "name": "Take the Bait",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "3.80",
+   "qty_buying": 48
+  },
+  {
+   "scryfall_id": "d763695b-c184-409d-962d-5aaf39a6264e",
+   "name": "Feather, Radiant Arbiter",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "true",
+   "price_buy": "0.15",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "dcdddadf-4e1f-4a62-9413-e4426cf5e100",
+   "name": "Angel of the Ruins",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "b63d828d-4f62-424b-969a-00dcc4651b56",
+   "name": "Comeuppance",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "3.25",
+   "qty_buying": 67
+  },
+  {
+   "scryfall_id": "50875c99-c5c3-41dd-a0f9-08c98edfebc9",
+   "name": "Darien, King of Kjeldor",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.33",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "57f42d1b-c738-43bc-9e0d-f2c74731112f",
+   "name": "Duelist's Heritage",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.85",
+   "qty_buying": 24
+  },
+  {
+   "scryfall_id": "46dc2519-2729-4bbd-8892-fab6186bf116",
+   "name": "Elspeth, Sun's Champion",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.45",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "eea3623d-1d39-4045-acdb-f0fb184ccbc8",
+   "name": "Ghostly Prison",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "4.00",
+   "qty_buying": 22
+  },
+  {
+   "scryfall_id": "d483b409-1853-4456-a077-daeb77e165ba",
+   "name": "Gideon's Sacrifice",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.02",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "08788504-17b9-47b1-b928-f395d0057eed",
+   "name": "Keeper of the Accord",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.52",
+   "qty_buying": 29
+  },
+  {
+   "scryfall_id": "9e83a0ef-4fea-45ba-86c0-130d6687f7fe",
+   "name": "Loran of the Third Path",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "4.00",
+   "qty_buying": 33
+  },
+  {
+   "scryfall_id": "bec6349c-2b41-45da-a932-9b76f04f48f6",
+   "name": "Martial Impetus",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "a30947a1-b25a-4570-b36c-75c4e9689abd",
+   "name": "Orzhov Advokist",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "3b1b7db1-92fc-4a4f-940c-fca416ab2837",
+   "name": "Promise of Loyalty",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.09",
+   "qty_buying": 13
+  },
+  {
+   "scryfall_id": "22a6673b-1528-4e0f-b316-bd482c7ed8aa",
+   "name": "Seal of Cleansing",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "8b8f4489-3d07-4e57-9b94-afa52fa984f8",
+   "name": "Selfless Squire",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.25",
+   "qty_buying": 23
+  },
+  {
+   "scryfall_id": "475cd448-5d28-40a4-8f68-0b29696e6ec0",
+   "name": "Sevinne's Reclamation",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.18",
+   "qty_buying": 15
+  },
+  {
+   "scryfall_id": "f1ced678-5cfd-49ff-9420-6ee52d5edf5a",
+   "name": "Smuggler's Share",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "8.50",
+   "qty_buying": 28
+  },
+  {
+   "scryfall_id": "18f3a850-b2e1-4970-9971-5f662fb3df31",
+   "name": "Soul Snare",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "954c0bca-c613-4915-9811-128d3c64ba62",
+   "name": "Stalking Leonin",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "a7e78f14-ff68-4ba1-b8c7-b0f792ab03bd",
+   "name": "Sun Titan",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.10",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "210920ef-917b-4e2c-a5da-1180baa37959",
+   "name": "Vow of Duty",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "32341fcd-b29b-434c-b004-3430e307a45b",
+   "name": "Wall of Omens",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 14
+  },
+  {
+   "scryfall_id": "3ce8b722-7bc0-4053-8627-7846f9d17eda",
+   "name": "Windborn Muse",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.52",
+   "qty_buying": 27
+  },
+  {
+   "scryfall_id": "333bcdcd-fb78-4a87-bb72-2678ee89a2ee",
+   "name": "Winds of Rath",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.09",
+   "qty_buying": 19
+  },
+  {
+   "scryfall_id": "bc63ff71-ff42-4baf-977b-55f69c8e122f",
+   "name": "Agitator Ant",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 22
+  },
+  {
+   "scryfall_id": "0b5cb154-1825-4b81-a109-7b3e9592c65c",
+   "name": "Brash Taunter",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "2.00",
+   "qty_buying": 23
+  },
+  {
+   "scryfall_id": "32cc103e-949d-42d4-aadd-490a261c9ad9",
+   "name": "Curse of Opulence",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "3.80",
+   "qty_buying": 24
+  },
+  {
+   "scryfall_id": "c5323fe7-d9df-4287-ae13-d9db35f7973b",
+   "name": "Disrupt Decorum",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "2.50",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "a18fdaf9-964d-45e9-bd40-a8fc745ddd1e",
+   "name": "Etali, Primal Storm",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.52",
+   "qty_buying": 13
+  },
+  {
+   "scryfall_id": "ebb44595-56f6-4be5-80bb-618ddd320f4a",
+   "name": "Fiendish Duo",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.00",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "824aa845-0523-4434-8992-bce42f5b2bcb",
+   "name": "Frontier Warmonger",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "721df547-d777-4247-b130-a4e247445b04",
+   "name": "Kazuul, Tyrant of the Cliffs",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.08",
+   "qty_buying": 12
+  },
+  {
+   "scryfall_id": "8f06e3db-ce55-4535-8557-cc52c5fce637",
+   "name": "Rite of the Raging Storm",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.38",
+   "qty_buying": 62
+  },
+  {
+   "scryfall_id": "14ce200f-95c9-4fae-be61-a6e7749dffe6",
+   "name": "Shiny Impetus",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "ffee18af-1160-46ad-9640-87eac49a5239",
+   "name": "Spectacular Showdown",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.70",
+   "qty_buying": 29
+  },
+  {
+   "scryfall_id": "d391c561-906f-4a5b-a36c-3b8743e05af1",
+   "name": "Vengeful Ancestor",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.17",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "a0742d43-8a67-4485-b0ce-5a4e057fa915",
+   "name": "Vow of Lightning",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "0526277f-538b-42d0-8c75-c390f599b94e",
+   "name": "Anya, Merciless Angel",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.15",
+   "qty_buying": 24
+  },
+  {
+   "scryfall_id": "55a2f767-5928-44c5-91b7-2300bade458f",
+   "name": "Boros Reckoner",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 11
+  },
+  {
+   "scryfall_id": "c5bda1a7-537f-4a80-95a0-c45eb127969b",
+   "name": "Deflecting Palm",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.50",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "900b8908-ba51-472e-ab7a-43bd07f90577",
+   "name": "Gisela, Blade of Goldnight",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "5.00",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "333f6334-f027-4bec-95d7-7af80508c4ca",
+   "name": "Ancient Stone Idol",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.36",
+   "qty_buying": 33
+  },
+  {
+   "scryfall_id": "e593bb16-e709-4d92-bf6f-239f6a11f7db",
+   "name": "Arcane Signet",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.10",
+   "qty_buying": 100
+  },
+  {
+   "scryfall_id": "bcdf583e-25f8-4227-96e9-e70ec8a36b09",
+   "name": "Bloodthirsty Blade",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.18",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "8f98234e-7376-4953-8985-2d184b1b3fda",
+   "name": "Fellwar Stone",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.19",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "b227672f-967e-4f8d-87f4-c6cd4622fe3f",
+   "name": "Mind Stone",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 50
+  },
+  {
+   "scryfall_id": "d9e098aa-a886-430e-8f11-78fb6f2d8ada",
+   "name": "Sol Ring",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.45",
+   "qty_buying": 1000
+  },
+  {
+   "scryfall_id": "a3879b81-aa4c-4d35-bed2-78ebb4a50b59",
+   "name": "Solemn Simulacrum",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 100
+  },
+  {
+   "scryfall_id": "45448aa7-50e2-4a40-8981-4f4bc466932b",
+   "name": "Steel Hellkite",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "b0ae2f4d-c0c6-486f-94f6-2375888fcc34",
+   "name": "Talisman of Conviction",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.32",
+   "qty_buying": 39
+  },
+  {
+   "scryfall_id": "67b26b45-19bf-4675-86c4-fae4f3aca234",
+   "name": "Thought Vessel",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.80",
+   "qty_buying": 26
+  },
+  {
+   "scryfall_id": "8d4cb84a-fa17-4a85-a687-ee010a789d53",
+   "name": "Tome of Legends",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.04",
+   "qty_buying": 14
+  },
+  {
+   "scryfall_id": "c6e87676-65c0-4306-b499-489db61c2104",
+   "name": "Access Tunnel",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.40",
+   "qty_buying": 19
+  },
+  {
+   "scryfall_id": "46b99a84-3733-48bf-b743-522e5f94aca3",
+   "name": "Ash Barrens",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "5148fe39-739f-4e9a-8c98-b7b983759138",
+   "name": "Boros Garrison",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.04",
+   "qty_buying": 15
+  },
+  {
+   "scryfall_id": "878fcea5-9a59-4b98-80b8-67e95f35f949",
+   "name": "Castle Ardenvale",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.12",
+   "qty_buying": 25
+  },
+  {
+   "scryfall_id": "96c3244e-930f-498c-959e-0f000151597d",
+   "name": "Command Tower",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.08",
+   "qty_buying": 50
+  },
+  {
+   "scryfall_id": "703da628-5a77-4cb4-8c29-1bdbae500d50",
+   "name": "Exotic Orchard",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 20
+  },
+  {
+   "scryfall_id": "bdb27a86-0fbd-4123-9c8e-630c855d5e9e",
+   "name": "Furycalm Snarl",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "15cfec15-95b5-47d6-9714-ff920ce97932",
+   "name": "Kher Keep",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "388169df-4cce-452d-9215-e3f814ff4fdf",
+   "name": "Labyrinth of Skophos",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.09",
+   "qty_buying": 22
+  },
+  {
+   "scryfall_id": "bf4797b0-4d0a-433f-b891-b14f96fd1484",
+   "name": "Myriad Landscape",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.08",
+   "qty_buying": 15
+  },
+  {
+   "scryfall_id": "4a58a287-e4ca-4c6b-8096-142660cee299",
+   "name": "Needle Spires",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "f5a1db89-d37f-4839-8ca4-598686c5d6de",
+   "name": "Reliquary Tower",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.20",
+   "qty_buying": 100
+  },
+  {
+   "scryfall_id": "670d6a0d-d10b-4b0a-961a-a95dbf413fc5",
+   "name": "Rogue's Passage",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.26",
+   "qty_buying": 100
+  },
+  {
+   "scryfall_id": "24ce6fec-d712-494d-8623-6acc0cc0056a",
+   "name": "Scavenger Grounds",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 10
+  },
+  {
+   "scryfall_id": "3b2c82ea-6793-407c-ac9f-5fc14d4d09ea",
+   "name": "Slayers' Stronghold",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.06",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "1eb80fb8-d72b-4aac-b057-d91b49e286a5",
+   "name": "Sunhome, Fortress of the Legion",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.04",
+   "qty_buying": 23
+  },
+  {
+   "scryfall_id": "2d21d25e-830a-4d32-b292-c24cdab7516a",
+   "name": "Temple of the False God",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.01",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "fae394de-a46c-4659-b0c6-aaf9f2c8e190",
+   "name": "Temple of Triumph",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "fdf6eb1d-aea4-4705-acbe-b428ad8616aa",
+   "name": "Throne of the High City",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "0.03",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "a824d5c0-cdd3-42e2-ac04-b8cada566163",
+   "name": "War Room",
+   "variation": "",
+   "edition": "Murders at Karlov Manor Commander Decks",
+   "is_foil": "false",
+   "price_buy": "1.00",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "81a1a8a6-916b-4eef-8079-6775afcb63cf",
+   "name": "Plains",
+   "variation": "0277",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "true",
+   "price_buy": "0.08",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "de754d20-5371-456b-9064-8f0687d2eab7",
+   "name": "Mountain",
+   "variation": "0283",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "true",
+   "price_buy": "0.08",
+   "qty_buying": 0
+  },
+  {
+   "scryfall_id": "93ddde4f-d35e-4128-8f43-d0eadbd715de",
+   "name": "Escape Tunnel",
+   "variation": "",
+   "edition": "Murders at Karlov Manor",
+   "is_foil": "true",
+   "price_buy": "0.08",
+   "qty_buying": 0
+  }
+ ]
+}
